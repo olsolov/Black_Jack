@@ -10,4 +10,8 @@ class Player
   def add_bank(bank)
     @bank = bank
   end
+
+  def add_card(card)
+    @hand << card
+  end
 end

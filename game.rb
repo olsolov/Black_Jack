@@ -21,6 +21,9 @@ class Game
       took_card = deck.took_card
       player.add_card(took_card)
     end
+
+    print "#{@name}, ваши карты: "
+    player.show_cards
   end
 end
 

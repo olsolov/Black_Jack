@@ -10,28 +10,32 @@ class Game
     @name = gets.strip.capitalize
   end
 
+  def create_player
+    @player = Player.new
+    bank_player = Bank.new(100)
+    @player.add_bank(bank_player)
+  end
+
 # rubocop: disable all
   def start
-    player = Player.new
-    bank_player = Bank.new(100)
-    player.add_bank(bank_player)
-
     deck = Deck.new
     2.times do
       deck.take_card
       took_card = deck.took_card
-      player.add_card(took_card)
+      @player.add_card(took_card)
     end
 
     print "#{@name}, ваши карты: "
-    player.show_cards
+    @player.show_cards
 
-    player.bank.place_bet(10)
+    @player.bank.place_bet(10)
     puts "Вы сделали ставку 10$"
+    p @player
   end
 end
 # rubocop: enable all
 
 new_game = Game.new
 new_game.enter_name
+new_game.create_player
 new_game.start

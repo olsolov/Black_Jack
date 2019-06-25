@@ -5,13 +5,16 @@ require_relative 'bank'
 require_relative 'deck'
 
 class Game
-  print 'Введите ваше имя: '
-  name = gets.strip.capitalize
+  def enter_name
+    print 'Введите ваше имя: '
+    @name = gets.strip.capitalize
+  end
 
   def start
     player = Player.new
     bank_player = Bank.new(100)
     player.add_bank(bank_player)
+
     deck = Deck.new
     2.times do
       deck.take_card
@@ -22,4 +25,5 @@ class Game
 end
 
 new_game = Game.new
+new_game.enter_name
 new_game.start

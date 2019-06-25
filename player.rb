@@ -21,4 +21,8 @@ class Player
     end
     puts
   end
+
+  def clear_hand
+    @hand = []
+  end
 end

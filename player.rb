@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Player
-  attr_reader :bank
+  attr_reader :bank, :hand
 
   def initialize
     @hand = []
@@ -13,5 +13,12 @@ class Player
 
   def add_card(card)
     @hand << card
+  end
+
+  def show_cards
+    @hand.each do |card|
+      print "#{card} "
+    end
+    puts
   end
 end

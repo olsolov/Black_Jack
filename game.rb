@@ -18,6 +18,10 @@ class Game
 
 # rubocop: disable all
   def start
+    enter_name
+
+    create_player
+
     deck = Deck.new
     2.times do
       deck.take_card
@@ -30,12 +34,15 @@ class Game
 
     @player.bank.place_bet(10)
     puts "Вы сделали ставку 10$"
-    p @player
+
+    puts "Введите 1, если вы хотите пропустить ход"
+    puts "Введите 2, если вы хотите открыть карты"
+    puts "Введите 3, если вы хотите взять картy" if @player.hand.size == 2 
+
+    player_choice = gets.to_i
   end
 end
 # rubocop: enable all
 
 new_game = Game.new
-new_game.enter_name
-new_game.create_player
 new_game.start

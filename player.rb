@@ -23,25 +23,27 @@ class Player
     puts
   end
 
+  # rubocop: disable all
   def count_points
     @hand.each do |card|
       if card[0] =~ /[[:digit:]]/
-        if card[0] == "1"
-          @points += 10
-        else
-          @points += card[0].to_i
-        end
+        @points += if card[0] == '1'
+                     10
+                   else
+                     card[0].to_i
+                   end
       end
 
-      if card[0] =~ /[[:alpha:]]/
-        if card[0] == "A"
-          @points += 11
-        else
-          @points += 10
-        end
-      end
+      next unless card[0] =~ /[[:alpha:]]/
+
+      @points += if card[0] == 'A'
+                   11
+                 else
+                   10
+                 end
     end
   end
+  # rubocop: enable all
 
   def clear_hand
     @hand = []

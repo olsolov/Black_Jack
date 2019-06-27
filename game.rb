@@ -40,7 +40,30 @@ class Game
     puts "Введите 3, если вы хотите взять картy" if @player.hand.size == 2 
 
     player_choice = gets.to_i
+    @points = 0
+
+  def count_points
+    @player.hand.each do |card|
+      if card[0] =~ /[[:digit:]]/
+        if card[0] == "1"
+          @points += 10
+        else
+          @points += card[0].to_i
+        end
+      end
+
+      if card[0] =~ /[[:alpha:]]/
+        if card[0] == "A"
+          @points += 11
+        else
+          @points += 10
+        end
+      end
+      puts @points
+    end
   end
+  end
+
 end
 # rubocop: enable all
 

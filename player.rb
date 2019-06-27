@@ -5,7 +5,6 @@ class Player
 
   def initialize
     @hand = []
-    @points = 0
   end
 
   def add_bank(bank)
@@ -25,6 +24,7 @@ class Player
 
   # rubocop: disable all
   def count_points
+    @points = 0
     @hand.each do |card|
       if card[0] =~ /[[:digit:]]/
         @points += if card[0] == '1'
@@ -46,6 +46,6 @@ class Player
   # rubocop: enable all
 
   def clear_hand
-    @hand = []
+    @hand.clear
   end
 end

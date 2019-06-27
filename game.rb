@@ -23,7 +23,6 @@ class Game
     @dealer.add_bank(bank_dealer)
   end
 
-
 # rubocop: disable all
   def start
     enter_name
@@ -56,16 +55,21 @@ class Game
     @player.count_points
     puts "Ваши очки: #{@player.points}"
 
-    puts 'Введите 1, если вы хотите пропустить ход'
-    puts 'Введите 2, если вы хотите открыть карты'
-    puts 'Введите 3, если вы хотите взять картy' if @player.hand.size == 2 
+    step_1
 
     player_choice = gets.to_i
 
     if player_choice == 1
-      # dealer.make_move
-    elsif  player_choice == 2
-      @player.show_cards
+      @dealer.count_points
+
+      return unless @dealer.points < 17
+
+      deck.take_card
+      took_card = deck.took_card
+      @dealer.add_card(took_card)
+
+    elsif player_choice == 2
+      open_cards
     elsif player_choice == 3
       return unless @player.hand.size == 2 
       deck.take_card
@@ -75,9 +79,39 @@ class Game
       puts 'Такого ответа нет'
     end
     @player.show_cards
+    @player.count_points
+    puts "Ваши очки: #{@player.points}"
 
+    step_1
+
+    player_choice = gets.to_i
   end
 
+  def step_1
+    puts 'Введите 1, если вы хотите пропустить ход'
+    puts 'Введите 2, если вы хотите открыть карты'
+    puts 'Введите 3, если вы хотите взять картy' if @player.hand.size == 2
+  end
+
+  def open_cards
+    print "#{@name}, ваши карты: "
+    @player.show_cards
+    puts "Ваши очки: #{@player.points}"
+
+    print "Карты дилера: "
+    @dealer.show_cards
+    @dealer.count_points
+    puts "Очки дилера: #{@dealer.points}"
+
+    self.find_winner
+  end
+
+  def find_winner
+    puts "Вы выиграли!" if @player.points == 21 || @player.points < 21 && (@dealer.points < @player.points)
+    puts "Дилер выиграл!" if @dealer.points == 21 || @dealer.points < 21 && (@player.points < @dealer.points)
+    puts "Ничья!" if @player.points == 21 && @dealer.points == 21
+    puts "Победителя нет" if @player.points > 21 && @dealer.points > 21
+  end
 end
 # rubocop: enable all
 

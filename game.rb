@@ -23,7 +23,6 @@ class Game
     @dealer.add_bank(bank_dealer)
   end
 
-# rubocop: disable all
   def start
     loop do
       # enter_name
@@ -47,7 +46,7 @@ class Game
       print "#{@name}, ваши карты: "
       @player.show_cards
 
-      print "Карты дилера: "
+      print 'Карты дилера: '
       @dealer.show_cards_close
       @dealer.count_points
 
@@ -65,10 +64,10 @@ class Game
         step_1 unless @player_choice == 2
       end
 
-      print "Хотите ещё сыграть?(Y/N): "
+      print 'Хотите ещё сыграть?(Y/N): '
       input = gets.strip.capitalize
 
-      break if input == "N"
+      break if input == 'N'
     end
   end
 
@@ -82,14 +81,14 @@ class Game
     if @player_choice == 1
       dealer_move if @dealer.points < 17
 
-      print "Карты дилера: "
+      print 'Карты дилера: '
       @dealer.show_cards_close
-
 
     elsif @player_choice == 2
       open_cards
     elsif @player_choice == 3
-      return unless @player.hand.size == 2 
+      return unless @player.hand.size == 2
+
       @deck.take_card
       took_card = @deck.took_card
       @player.add_card(took_card)
@@ -100,7 +99,7 @@ class Game
 
       dealer_move if @dealer.points < 17
 
-      print "Карты дилера: "
+      print 'Карты дилера: '
       @dealer.show_cards_close
     else
       puts 'Такого ответа нет'
@@ -118,24 +117,32 @@ class Game
     @player.show_cards
     puts "Ваши очки: #{@player.points}"
 
-    print "Карты дилера: "
+    print 'Карты дилера: '
     @dealer.show_cards
     @dealer.count_points
     puts "Очки дилера: #{@dealer.points}"
 
-    self.find_winner
+    find_winner
   end
 
   def find_winner
-    puts "--------------------------"
-    puts "Вы выиграли!" if @player.points == 21 || @player.points < 21 && (@dealer.points < @player.points) || @dealer.points > 21
-    puts "Дилер выиграл!" if @dealer.points == 21 || @dealer.points < 21 && (@player.points < @dealer.points) || @player.points > 21
-    puts "Ничья!" if @player.points <= 21 && @dealer.points <= 21 && @player.points == @dealer.points 
-    puts "Победителя нет" if @player.points > 21 && @dealer.points > 21
-    puts "--------------------------"
+    puts '--------------------------'
+    if @player.points == 21 || @player.points < 21 && (@dealer.points < @player.points) || @player.points < 21 && @dealer.points > 21
+      puts 'Вы выиграли!'
+      @winner = @player
+    elsif @dealer.points == 21 || @dealer.points < 21 && (@player.points < @dealer.points) || @dealer.points < 21 && @player.points > 21
+      puts 'Дилер выиграл!'
+      @winner = @dealer
+    elsif @player.points <= 21 && @dealer.points <= 21 && @player.points == @dealer.points
+      puts 'Ничья!'
+      @winner = 'draw'
+    else
+      puts 'Победителя нет' # if @player.points > 21 && @dealer.points > 21
+      @winner = nil
+    end
+    puts '--------------------------'
   end
 end
-# rubocop: enable all
 
 new_game = Game.new
 new_game.start

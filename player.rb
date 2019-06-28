@@ -22,7 +22,6 @@ class Player
     puts
   end
 
-  # rubocop: disable all
   def count_points
     @points = 0
     @hand.each do |card|
@@ -43,7 +42,6 @@ class Player
                  end
     end
   end
-  # rubocop: enable all
 
   def clear_hand
     @hand.clear

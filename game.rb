@@ -29,6 +29,7 @@ class Game
 
       create_player
       create_dealer
+      @game_bank = Bank.new(0)
 
       @deck = Deck.new
       2.times do
@@ -50,16 +51,22 @@ class Game
       @dealer.show_cards_close
       @dealer.count_points
 
+      @dealer.bank.place_bet(10)
       @player.bank.place_bet(10)
       puts 'Вы сделали ставку 10$'
+      @game_bank.add_money(20)
 
       @player.count_points
       puts "Ваши очки: #{@player.points}"
 
       step_1
 
-      if @player.hand.size == 3 && @dealer.hand.size
+      if @player.hand.size == 3 && @dealer.hand.size == @player.hand.size
         open_cards
+        find_winner
+        give_cash
+        puts "У вас на счету: $ #{@player.bank.sum}"
+
       else
         step_1 unless @player_choice == 2
       end
@@ -86,6 +93,10 @@ class Game
 
     elsif @player_choice == 2
       open_cards
+      find_winner
+      give_cash
+      puts "У вас на счету: $ #{@player.bank.sum}"
+
     elsif @player_choice == 3
       return unless @player.hand.size == 2
 
@@ -121,8 +132,6 @@ class Game
     @dealer.show_cards
     @dealer.count_points
     puts "Очки дилера: #{@dealer.points}"
-
-    find_winner
   end
 
   def find_winner
@@ -141,6 +150,20 @@ class Game
       @winner = nil
     end
     puts '--------------------------'
+  end
+
+  def give_cash
+    if @winner == @player
+      @game_bank.place_bet(20)
+      @player.bank.add_money(20)
+    elsif @winner == @dealer
+      @game_bank.place_bet(20)
+      @dealer.bank.add_money(20)
+    elsif @winner == 'draw'
+      @game_bank.place_bet(20)
+      @player.bank.add_money(10)
+      @dealer.bank.add_money(10)
+    end
   end
 end
 

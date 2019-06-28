@@ -24,13 +24,14 @@ class Game
   end
 
   def start
+    # enter_name
+
+    create_player
+    create_dealer
+
+    @game_bank = Bank.new(0)
+
     loop do
-      # enter_name
-
-      create_player
-      create_dealer
-      @game_bank = Bank.new(0)
-
       @deck = Deck.new
       2.times do
         @deck.take_card
@@ -71,10 +72,18 @@ class Game
         step_1 unless @player_choice == 2
       end
 
-      print 'Хотите ещё сыграть?(Y/N): '
+      if @player.bank.sum.zero?
+        puts 'На вашем счету $ 0, игра окончена'
+        break
+      end
+
+      print 'Хотите сыграть ещё?(Y/N): '
       input = gets.strip.capitalize
 
       break if input == 'N'
+
+      @player.clear_hand
+      @dealer.clear_hand
     end
   end
 
@@ -160,9 +169,11 @@ class Game
       @game_bank.place_bet(20)
       @dealer.bank.add_money(20)
     elsif @winner == 'draw'
-      @game_bank.place_bet(20)
-      @player.bank.add_money(10)
-      @dealer.bank.add_money(10)
+      sum = @game_bank.sum
+      half_sum = sum / 2
+      @game_bank.place_bet(sum)
+      @player.bank.add_money(half_sum)
+      @dealer.bank.add_money(half_sum)
     end
   end
 end

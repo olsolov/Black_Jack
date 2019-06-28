@@ -26,7 +26,7 @@ class Game
 # rubocop: disable all
   def start
     loop do
-      enter_name
+      # enter_name
 
       create_player
       create_dealer
@@ -64,6 +64,11 @@ class Game
       else
         step_1 unless @player_choice == 2
       end
+
+      print "Хотите ещё сыграть?(Y/N): "
+      input = gets.strip.capitalize
+
+      break if input == "N"
     end
   end
 

@@ -1,14 +1,13 @@
 # frozen_string_literal: true
 
+require_relative 'bank'
+
 class Player
   attr_reader :bank, :hand, :points, :took_card
 
   def initialize
     @hand = []
-  end
-
-  def add_bank(bank)
-    @bank = bank
+    @bank = Bank.new(100)
   end
 
   def take_card(deck)

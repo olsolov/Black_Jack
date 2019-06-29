@@ -31,7 +31,6 @@ class Game
       @player.show_cards
       print 'Карты дилера: '
       @dealer.show_cards_close
-      @dealer.count_points
 
       # make bets
       @dealer.bank.place_bet(10)
@@ -43,14 +42,7 @@ class Game
       @player.count_points
       puts "Ваши очки: #{@player.points}"
 
-      step_1
-
-      if @player.hand.size == 3 && @dealer.hand.size == @player.hand.size
-        game_result
-        puts "У вас на счету: $ #{@player.bank.sum}"
-      else
-        step_1 unless @player_choice == 2
-      end
+      step_one
 
       if @player.bank.sum.zero?
         puts 'На вашем счету $ 0, игра окончена'
@@ -67,39 +59,54 @@ class Game
     end
   end
 
-  def step_1
-    puts 'Введите 1, если вы хотите пропустить ход'
-    puts 'Введите 2, если вы хотите открыть карты'
-    puts 'Введите 3, если вы хотите взять картy' if @player.hand.size == 2
+  def step_one
+    loop do
+      puts 'Введите 1, если вы хотите пропустить ход'
+      puts 'Введите 2, если вы хотите открыть карты'
+      puts 'Введите 3, если вы хотите взять картy' if @player.hand.size == 2
 
-    @player_choice = gets.to_i
+      @choice = gets.strip
 
-    if @player_choice == 1
-      @dealer.take_card(@deck) if @dealer.points < 17
+      case @choice
+      when '1'
+        dealer_move
+      when '2'
+        game_result
+        puts "У вас на счету: $ #{@player.bank.sum}"
+        break
+      when '3'
+        return unless @player.hand.size == 2
 
-      print 'Карты дилера: '
-      @dealer.show_cards_close
+        @player.take_card(@deck)
+        dealer_move
+      else
+        puts 'Такого ответа нет'
+      end
 
-    elsif @player_choice == 2
-      game_result
-      puts "У вас на счету: $ #{@player.bank.sum}"
+      if @player.hand.size == 3 && @dealer.hand.size == 3
+        game_result
+        puts "У вас на счету: $ #{@player.bank.sum}"
+        break
+      end
 
-    elsif @player_choice == 3
-      return unless @player.hand.size == 2
-
-      @player.take_card(@deck)
-
-      @player.show_cards
-      @player.count_points
-      puts "Ваши очки: #{@player.points}"
-
-      @dealer.take_card(@deck) if @dealer.points < 17
-
-      print 'Карты дилера: '
-      @dealer.show_cards_close
-    else
-      puts 'Такого ответа нет'
+      step_two
     end
+  end
+
+  def step_two
+    print "#{@name}, ваши карты: "
+    @player.show_cards
+
+    @player.count_points
+    puts "Ваши очки: #{@player.points}"
+
+    print 'Карты дилера: '
+    @dealer.show_cards_close
+  end
+
+  def dealer_move
+    @dealer.count_points
+    @dealer.take_card(@deck) if @dealer.points < 17 && @dealer.hand.size <= 3
   end
 
   def open_cards

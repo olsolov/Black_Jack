@@ -7,7 +7,7 @@ class Bank
     @sum = sum
   end
 
-  def add_money(money)
+  def get_win(money)
     @sum += money
   end
 

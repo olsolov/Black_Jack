@@ -138,14 +138,14 @@ class Game
   end
 
   def give_cash
+    sum = @game_bank.sum
     if @winner == @player
-      @game_bank.give_win(20)
-      @player.bank.get_win(20)
+      @game_bank.give_win(sum)
+      @player.bank.get_win(sum)
     elsif @winner == @dealer
-      @game_bank.give_win(20)
-      @dealer.bank.get_win(20)
+      @game_bank.give_win(sum)
+      @dealer.bank.get_win(sum)
     elsif @winner == 'draw'
-      sum = @game_bank.sum
       half_sum = sum / 2
       @game_bank.give_win(sum)
       @player.bank.get_win(half_sum)

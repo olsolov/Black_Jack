@@ -75,8 +75,6 @@ class Game
         puts "У вас на счету: $ #{@player.bank.sum}"
         break
       when '3'
-        return unless @player.hand.size == 2
-
         @player.take_card(@deck)
         dealer_move
       else
@@ -112,6 +110,7 @@ class Game
   def open_cards
     print "#{@name}, ваши карты: "
     @player.show_cards
+    @player.count_points
     puts "Ваши очки: #{@player.points}"
 
     print 'Карты дилера: '

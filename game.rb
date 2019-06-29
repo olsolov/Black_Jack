@@ -23,7 +23,7 @@ class Game
     @dealer.add_bank(bank_dealer)
   end
 
-  def start
+  def run
     # enter_name
 
     create_player
@@ -178,5 +178,4 @@ class Game
   end
 end
 
-new_game = Game.new
-new_game.start
+Game.new.run

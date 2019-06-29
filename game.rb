@@ -61,9 +61,7 @@ class Game
       step_1
 
       if @player.hand.size == 3 && @dealer.hand.size == @player.hand.size
-        open_cards
-        find_winner
-        give_cash
+        game_result
         puts "У вас на счету: $ #{@player.bank.sum}"
 
       else
@@ -99,13 +97,12 @@ class Game
       @dealer.show_cards_close
 
     elsif @player_choice == 2
-      open_cards
-      find_winner
-      give_cash
+      game_result
       puts "У вас на счету: $ #{@player.bank.sum}"
 
     elsif @player_choice == 3
       return unless @player.hand.size == 2
+
       @player.take_card(@deck)
 
       @player.show_cards
@@ -164,6 +161,12 @@ class Game
       @player.bank.add_money(half_sum)
       @dealer.bank.add_money(half_sum)
     end
+  end
+
+  def game_result
+    open_cards
+    find_winner
+    give_cash
   end
 end
 

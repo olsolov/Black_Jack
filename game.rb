@@ -3,58 +3,43 @@
 require_relative 'player'
 require_relative 'dealer'
 require_relative 'bank'
+require_relative 'game_bank'
 require_relative 'deck'
 
 class Game
-  def enter_name
+  def run
+    # enter name
     print 'Введите ваше имя: '
     @name = gets.strip.capitalize
-  end
 
-  def create_player
-    @player = Player.new
-    bank_player = Bank.new(100)
-    @player.add_bank(bank_player)
-  end
-
-  def create_dealer
-    @dealer = Dealer.new
-    bank_dealer = Bank.new(100)
-    @dealer.add_bank(bank_dealer)
-  end
-
-  def run
-    # enter_name
-
-    create_player
-    create_dealer
-
-    @game_bank = Bank.new(0)
+    # create player, dealer and game bank
+    @players = [@player = Player.new, @dealer = Dealer.new]
+    @game_bank = GameBank.new(0)
 
     loop do
+      # create deck and shuffle cards
       @deck = Deck.new
       @deck.cards.shuffle!
 
-      2.times do
-        @player.take_card(@deck)
+      # hand out 2 cards
+      @players.each do |player|
+        2.times { player.take_card(@deck) }
       end
 
-      2.times do
-        @dealer.take_card(@deck)
-      end
-
+      # show player's and dealer's cards
       print "#{@name}, ваши карты: "
       @player.show_cards
-
       print 'Карты дилера: '
       @dealer.show_cards_close
       @dealer.count_points
 
+      # make bets
       @dealer.bank.place_bet(10)
       @player.bank.place_bet(10)
       puts 'Вы сделали ставку 10$'
-      @game_bank.add_money(20)
+      @game_bank.get_bets(20)
 
+      # show player's points
       @player.count_points
       puts "Ваши очки: #{@player.points}"
 
@@ -63,7 +48,6 @@ class Game
       if @player.hand.size == 3 && @dealer.hand.size == @player.hand.size
         game_result
         puts "У вас на счету: $ #{@player.bank.sum}"
-
       else
         step_1 unless @player_choice == 2
       end
@@ -149,17 +133,17 @@ class Game
 
   def give_cash
     if @winner == @player
-      @game_bank.place_bet(20)
-      @player.bank.add_money(20)
+      @game_bank.give_win(20)
+      @player.bank.get_win(20)
     elsif @winner == @dealer
-      @game_bank.place_bet(20)
-      @dealer.bank.add_money(20)
+      @game_bank.give_win(20)
+      @dealer.bank.get_win(20)
     elsif @winner == 'draw'
       sum = @game_bank.sum
       half_sum = sum / 2
-      @game_bank.place_bet(sum)
-      @player.bank.add_money(half_sum)
-      @dealer.bank.add_money(half_sum)
+      @game_bank.give_win(sum)
+      @player.bank.get_win(half_sum)
+      @dealer.bank.get_win(half_sum)
     end
   end
 

@@ -33,16 +33,14 @@ class Game
 
     loop do
       @deck = Deck.new
+      @deck.cards.shuffle!
+
       2.times do
-        @deck.take_card
-        took_card = @deck.took_card
-        @player.add_card(took_card)
+        @player.take_card(@deck)
       end
 
       2.times do
-        @deck.take_card
-        took_card = @deck.took_card
-        @dealer.add_card(took_card)
+        @dealer.take_card(@deck)
       end
 
       print "#{@name}, ваши карты: "
@@ -95,7 +93,7 @@ class Game
     @player_choice = gets.to_i
 
     if @player_choice == 1
-      dealer_move if @dealer.points < 17
+      @dealer.take_card(@deck) if @dealer.points < 17
 
       print 'Карты дилера: '
       @dealer.show_cards_close
@@ -108,28 +106,19 @@ class Game
 
     elsif @player_choice == 3
       return unless @player.hand.size == 2
-
-      @deck.take_card
-      took_card = @deck.took_card
-      @player.add_card(took_card)
+      @player.take_card(@deck)
 
       @player.show_cards
       @player.count_points
       puts "Ваши очки: #{@player.points}"
 
-      dealer_move if @dealer.points < 17
+      @dealer.take_card(@deck) if @dealer.points < 17
 
       print 'Карты дилера: '
       @dealer.show_cards_close
     else
       puts 'Такого ответа нет'
     end
-  end
-
-  def dealer_move
-    @deck.take_card
-    took_card = @deck.took_card
-    @dealer.add_card(took_card)
   end
 
   def open_cards

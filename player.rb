@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Player
-  attr_reader :bank, :hand, :points
+  attr_reader :bank, :hand, :points, :took_card
 
   def initialize
     @hand = []
@@ -11,8 +11,10 @@ class Player
     @bank = bank
   end
 
-  def add_card(card)
-    @hand << card
+  def take_card(deck)
+    @took_card = deck.cards[0]
+    @hand << @took_card
+    deck.cards.delete(@took_card)
   end
 
   def show_cards

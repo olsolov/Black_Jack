@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Deck
-  attr_reader :took_card
+  attr_reader :cards
 
   def initialize
     @cards = []
@@ -16,10 +16,5 @@ class Deck
         @cards << value + suits
       end
     end
-  end
-
-  def take_card
-    @took_card = @cards[rand(0..@cards.size)]
-    @cards.delete(@took_card)
   end
 end

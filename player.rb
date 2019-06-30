@@ -41,6 +41,8 @@ class Player
                  else
                    10
                  end
+
+      @points -= 10 if card[0] == 'A' && @points > 21
     end
   end
 

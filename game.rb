@@ -42,10 +42,15 @@ class Game
       @player.count_points
       puts "Ваши очки: #{@player.points}"
 
-      step_one
+      main_part_game
 
       if @player.bank.sum.zero?
         puts 'На вашем счету $ 0, игра окончена'
+        break
+      end
+
+      if @dealer.bank.sum.zero?
+        puts 'На счету дилера $ 0, вы выиграли!'
         break
       end
 
@@ -59,7 +64,7 @@ class Game
     end
   end
 
-  def step_one
+  def main_part_game
     loop do
       puts 'Введите 1, если вы хотите пропустить ход'
       puts 'Введите 2, если вы хотите открыть карты'
@@ -87,11 +92,11 @@ class Game
         break
       end
 
-      step_two
+      show_cards_player_dealer
     end
   end
 
-  def step_two
+  def show_cards_player_dealer
     print "#{@name}, ваши карты: "
     @player.show_cards
 

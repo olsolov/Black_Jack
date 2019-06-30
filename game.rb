@@ -44,6 +44,7 @@ class Game
 
       main_part_game
 
+      # check for player and dealer bank 
       if @player.bank.sum.zero?
         puts 'На вашем счету $ 0, игра окончена'
         break
@@ -54,11 +55,13 @@ class Game
         break
       end
 
+      # offer to play more
       print 'Хотите сыграть ещё?(Y/N): '
       input = gets.strip.capitalize
 
       break if input == 'N'
 
+      #remove cards from hand before the next game
       @player.clear_hand
       @dealer.clear_hand
     end
@@ -66,6 +69,7 @@ class Game
 
   def main_part_game
     loop do
+      # prompt the player to choose an action
       puts 'Введите 1, если вы хотите пропустить ход'
       puts 'Введите 2, если вы хотите открыть карты'
       puts 'Введите 3, если вы хотите взять картy' if @player.hand.size == 2
@@ -86,6 +90,7 @@ class Game
         puts 'Такого ответа нет'
       end
 
+      # automatic opening of cards if there are 3 of them
       if @player.hand.size == 3 && @dealer.hand.size == 3
         game_result
         puts "У вас на счету: $ #{@player.bank.sum}"

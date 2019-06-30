@@ -42,8 +42,12 @@ class Player
                    10
                  end
 
-      @points -= 10 if card[0] == 'A' && @points > 21
+      count_aces.times { @points -= 10 if card[0] == 'A' && @points > 21 }
     end
+  end
+
+  def count_aces
+    @hand.count { |card| card[0] == 'A' }
   end
 
   def clear_hand

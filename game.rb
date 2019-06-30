@@ -44,7 +44,7 @@ class Game
 
       main_part_game
 
-      # check for player and dealer bank 
+      # check for player and dealer bank
       if @player.bank.sum.zero?
         puts 'На вашем счету $ 0, игра окончена'
         break
@@ -61,7 +61,7 @@ class Game
 
       break if input == 'N'
 
-      #remove cards from hand before the next game
+      # remove cards from hand before the next game
       @player.clear_hand
       @dealer.clear_hand
     end

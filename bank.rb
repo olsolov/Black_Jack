@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
 class Bank
-  attr_reader :sum
+  attr_reader :amount
 
-  def initialize(sum)
-    @sum = sum
+  def initialize(amount)
+    @amount = amount
   end
 
-  def get_win(money)
-    @sum += money
+  def debit(amount)
+    @amount += amount
   end
 
-  def place_bet(money)
-    @sum -= money
+  def withdraw(amount)
+    @amount -= amount
   end
 end

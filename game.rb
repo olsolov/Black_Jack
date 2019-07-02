@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'interface'
 require_relative 'player'
 require_relative 'dealer'
 require_relative 'bank'
@@ -7,20 +8,16 @@ require_relative 'game_bank'
 require_relative 'deck'
 
 class Game
-  def run
-    # enter name
-    print 'Введите ваше имя: '
-    @name = gets.strip.capitalize
-
-    # create player, dealer and game bank
-    @players = [@player = Player.new, @dealer = Dealer.new]
+  def initialize
+    @interface = Interface.new
+    @player = Player.new(@interface.enter_name)
+    @dealer = Dealer.new
     @game_bank = GameBank.new(0)
+    @deck = Deck.new
+  end
 
+  def run
     loop do
-      # create deck and shuffle cards
-      @deck = Deck.new
-      @deck.cards.shuffle!
-
       # hand out 2 cards
       @players.each do |player|
         2.times { player.take_card(@deck) }

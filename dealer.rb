@@ -3,7 +3,11 @@
 require_relative 'player'
 
 class Dealer < Player
-  def show_cards_close
-    puts('*' * @hand.size).to_s
+  def player_cards_hide
+    @hand.player_cards_hide
+  end
+
+  def take_card?
+    count_points < 17 && cards_size <= 3
   end
 end

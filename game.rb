@@ -11,54 +11,49 @@ class Game
   def initialize
     @interface = Interface.new
     @player = Player.new(@interface.enter_name)
-    @dealer = Dealer.new
+    @dealer = Dealer.new('Dealer')
     @game_bank = GameBank.new(0)
-    @deck = Deck.new
+    run
+  end
+
+  def get_start_cards(*players)
+    players.each do |player|
+      2.times { player.take_card(@deck) }
+    end
   end
 
   def run
+    @deck = Deck.new
     loop do
       # hand out 2 cards
-      @players.each do |player|
-        2.times { player.take_card(@deck) }
-      end
+      get_start_cards(@player, @dealer)
 
-      # show player's and dealer's cards
-      print "#{@name}, ваши карты: "
-      @player.show_cards
-      print 'Карты дилера: '
-      @dealer.show_cards_close
+      # show player's and dealer's hide cards
+      show_cards_player_dealer
 
       # make bets
-      @dealer.bank.place_bet(10)
-      @player.bank.place_bet(10)
-      puts 'Вы сделали ставку 10$'
-      @game_bank.get_bets(20)
-
-      # show player's points
-      @player.count_points
-      puts "Ваши очки: #{@player.points}"
-
-      main_part_game
-
-      # check for player and dealer bank
-      if @player.bank.sum.zero?
-        puts 'На вашем счету $ 0, игра окончена'
+      begin
+        @game_bank.make_bets(@player, @dealer)
+      rescue RuntimeError => e
+        puts e.message
         break
       end
 
-      if @dealer.bank.sum.zero?
-        puts 'На счету дилера $ 0, вы выиграли!'
+      @interface.bet_message
+      @interface.amount_message(@player.amount, @dealer.amount)
+
+      main_part_game
+
+      if @dealer.amount.zero?
+        @interface.dealer_bankrupt_message
         break
       end
 
       # offer to play more
-      print 'Хотите сыграть ещё?(Y/N): '
-      input = gets.strip.capitalize
+      choice = @interface.offer_play
+      break if choice == 'N'
 
-      break if input == 'N'
-
-      # remove cards from hand before the next game
+      # # remove cards from hand before the next game
       @player.clear_hand
       @dealer.clear_hand
     end
@@ -67,105 +62,83 @@ class Game
   def main_part_game
     loop do
       # prompt the player to choose an action
-      puts 'Введите 1, если вы хотите пропустить ход'
-      puts 'Введите 2, если вы хотите открыть карты'
-      puts 'Введите 3, если вы хотите взять картy' if @player.hand.size == 2
+      choice = @interface.action_menu(@player.two_cards?)
 
-      @choice = gets.strip
-
-      case @choice
-      when '1'
+      case choice
+      when 1
         dealer_move
-      when '2'
+      when 2
         game_result
-        puts "У вас на счету: $ #{@player.bank.sum}"
+        @interface.amount_message(@player.amount, @dealer.amount)
         break
-      when '3'
+      when 3
         @player.take_card(@deck)
         dealer_move
       else
-        puts 'Такого ответа нет'
+        @interface.no_answer
       end
 
-      # automatic opening of cards if there are 3 of them
-      if @player.hand.size == 3 && @dealer.hand.size == 3
+      # automatic opening of cards if there are 3
+      if @player.cards_size == 3 && @dealer.cards_size == 3
         game_result
-        puts "У вас на счету: $ #{@player.bank.sum}"
+        @interface.amount_message(@player.amount, @dealer.amount)
         break
       end
 
+      # show player's and dealer's hide cards
       show_cards_player_dealer
     end
   end
 
   def show_cards_player_dealer
-    print "#{@name}, ваши карты: "
-    @player.show_cards
-
-    @player.count_points
-    puts "Ваши очки: #{@player.points}"
-
-    print 'Карты дилера: '
-    @dealer.show_cards_close
+    @interface.show_cards_points_player(@player.player_cards, @player.count_points)
+    @interface.show_hide_cards_dealer(@dealer.player_cards_hide)
   end
 
   def dealer_move
     @dealer.count_points
-    @dealer.take_card(@deck) if @dealer.points < 17 && @dealer.hand.size <= 3
+    @dealer.take_card(@deck) if @dealer.take_card?
   end
 
   def open_cards
-    print "#{@name}, ваши карты: "
-    @player.show_cards
-    @player.count_points
-    puts "Ваши очки: #{@player.points}"
-
-    print 'Карты дилера: '
-    @dealer.show_cards
-    @dealer.count_points
-    puts "Очки дилера: #{@dealer.points}"
+    @interface.show_cards_points_player(@player.player_cards, @player.count_points)
+    @interface.show_cards_points_dealer(@dealer.player_cards, @dealer.count_points)
   end
 
   def find_winner
-    puts '--------------------------'
-    if @player.points == 21 || @player.points < 21 && (@dealer.points < @player.points) || @player.points < 21 && @dealer.points > 21
-      puts 'Вы выиграли!'
-      @winner = @player
-    elsif @dealer.points == 21 || @dealer.points < 21 && (@player.points < @dealer.points) || @dealer.points < 21 && @player.points > 21
-      puts 'Дилер выиграл!'
-      @winner = @dealer
-    elsif @player.points <= 21 && @dealer.points <= 21 && @player.points == @dealer.points
-      puts 'Ничья!'
-      @winner = 'draw'
-    else
-      puts 'Победителя нет' # if @player.points > 21 && @dealer.points > 21
-      @winner = nil
+    player_points = @player.count_points
+    dealer_points = @dealer.count_points
+    if player_points > 21 && dealer_points > 21
+      return :none
+    elsif player_points <= 21 && dealer_points <= 21 && player_points == dealer_points
+      return :draw
+    elsif player_points == 21 && dealer_points < 21 || dealer_points > 21
+      return :player
+    elsif player_points < 21 && dealer_points < player_points || dealer_points > 21
+      return :player
+    elsif dealer_points == 21 && player_points < 21 || player_points > 21
+      return :dealer
+    elsif dealer_points < 21 && player_points < dealer_points || player_points > 21
+      return :dealer
     end
-    puts '--------------------------'
   end
 
-  def give_cash
-    sum = @game_bank.sum
-    case @winner
-    when @player
-      @game_bank.give_win(sum)
-      @player.bank.get_win(sum)
-    when @dealer
-      @game_bank.give_win(sum)
-      @dealer.bank.get_win(sum)
-    when 'draw'
-      half_sum = sum / 2
-      @game_bank.give_win(sum)
-      @player.bank.get_win(half_sum)
-      @dealer.bank.get_win(half_sum)
+  def give_cash(winner)
+    case winner
+    when :draw
+      @game_bank.refund(@player, @dealer)
+    when :player
+      @game_bank.reward_winner(@player)
+    when :dealer
+      @game_bank.reward_winner(@dealer)
     end
   end
 
   def game_result
     open_cards
-    find_winner
-    give_cash
+    @interface.show_winner(find_winner)
+    give_cash(find_winner)
   end
 end
 
-Game.new.run
+Game.new

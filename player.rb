@@ -1,56 +1,52 @@
 # frozen_string_literal: true
 
 require_relative 'bank'
+require_relative 'hand'
 
 class Player
-  attr_reader :bank, :hand, :points, :took_card
+  attr_reader :name, :hand, :bank, :took_card
 
-  def initialize
-    @hand = []
+  def initialize(name)
+    @name = name
+    @hand = Hand.new
     @bank = Bank.new(100)
   end
 
   def take_card(deck)
     @took_card = deck.cards[0]
-    @hand << @took_card
+    @hand.cards << @took_card
     deck.cards.delete(@took_card)
   end
 
-  def show_cards
-    @hand.each do |card|
-      print "#{card} "
-    end
-    puts
+  def player_cards
+    @hand.player_cards
+  end
+
+  def two_cards?
+    @hand.two_cards?
+  end
+
+  def cards_size
+    @hand.cards_size
   end
 
   def count_points
-    @points = 0
-    @hand.each do |card|
-      if card[0] =~ /[[:digit:]]/
-        @points += if card[0] == '1'
-                     10
-                   else
-                     card[0].to_i
-                   end
-      end
-
-      next unless card[0] =~ /[[:alpha:]]/
-
-      @points += if card[0] == 'A'
-                   11
-                 else
-                   10
-                 end
-
-      count_aces.times { @points -= 10 if card[0] == 'A' && @points > 21 }
-    end
+    @hand.count_points
   end
 
-  def count_aces
-    @hand.count { |card| card[0] == 'A' }
+  def amount
+    @bank.amount
+  end
+
+  def debit(amount)
+    @bank.debit(amount)
+  end
+
+  def withdraw(amount)
+    @bank.withdraw(amount)
   end
 
   def clear_hand
-    @hand.clear
+    @hand.clear_hand
   end
 end

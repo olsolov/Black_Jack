@@ -2,36 +2,40 @@
 
 require_relative 'bank'
 require_relative 'hand'
+require_relative 'game_rules'
 
 class Player
-  attr_reader :name, :hand, :bank, :took_card
+  include GameRules
+  attr_reader :name, :hand, :bank
 
   def initialize(name)
     @name = name
     @hand = Hand.new
-    @bank = Bank.new(100)
+    @bank = Bank.new(GameRules::PLAYER_BANK_INIT_AMOUNT)
   end
 
-  def take_card(deck)
-    @took_card = deck.cards[0]
-    @hand.cards << @took_card
-    deck.cards.delete(@took_card)
+  def take_card(card)
+    @hand.add_card(card)
   end
 
   def player_cards
-    @hand.player_cards
+    @hand.cards
   end
 
   def two_cards?
     @hand.two_cards?
   end
 
-  def cards_size
-    @hand.cards_size
+  def can_take_card?
+    !@hand.full?
   end
 
-  def count_points
-    @hand.count_points
+  def full?
+    @hand.full?
+  end
+
+  def count_sum
+    @hand.count_sum
   end
 
   def amount

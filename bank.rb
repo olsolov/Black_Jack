@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
+require_relative 'game_rules'
+
 class Bank
+  include GameRules
+  NOT_ENOUGH_MONEY = 'Недостаточно средств на счёте'
+
   attr_reader :amount
 
   def initialize(amount)
@@ -12,7 +17,7 @@ class Bank
   end
 
   def withdraw(amount)
-    raise 'Недостаточно средств на счёте, чтобы сделать ставку' if @amount.zero?
+    raise NOT_ENOUGH_MONEY if @amount < amount
 
     @amount -= amount
   end

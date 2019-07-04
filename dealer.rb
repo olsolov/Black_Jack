@@ -3,11 +3,7 @@
 require_relative 'player'
 
 class Dealer < Player
-  def player_cards_hide
-    @hand.player_cards_hide
-  end
-
-  def take_card?
-    count_points < 17 && cards_size <= 3
+  def can_take_card?
+    !@hand.full? && @hand.count_sum < GameRules::DEALER_MAX_SUM
   end
 end

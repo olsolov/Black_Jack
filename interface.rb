@@ -8,16 +8,18 @@ class Interface
     gets.strip.capitalize
   end
 
-  def show_cards_points_player(player_cards, player_points)
-    puts "Ваши карты: #{player_cards}, сумма очков: #{player_points}"
+  def show_sum(player_name, sum)
+    puts "Cумма очков #{player_name}: #{sum}"
   end
 
-  def show_cards_points_dealer(dealer_cards, dealer_points)
-    puts "Карты дилера: #{dealer_cards}, сумма очков: #{dealer_points}"
+  def show_cards(player_name, cards)
+    opened_cards = cards.map { |card| "#{card.rank}#{card.suit}" }
+    puts "Карты #{player_name}: #{opened_cards}"
   end
 
-  def show_hide_cards_dealer(dealer_cards)
-    puts "Карты дилера: #{dealer_cards}"
+  def show_hidden_cards(player_name, count)
+    cards_mask = Array.new(count, '*').join(' ')
+    puts "Карты #{player_name}: #{cards_mask}"
   end
 
   def bet_message
@@ -59,5 +61,9 @@ class Interface
   def offer_play
     print 'Хотите сыграть ещё?(Y/N): '
     gets.strip.capitalize
+  end
+
+  def show_error(error_message)
+    puts error_message
   end
 end

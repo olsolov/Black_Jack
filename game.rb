@@ -6,8 +6,11 @@ require_relative 'dealer'
 require_relative 'bank'
 require_relative 'game_bank'
 require_relative 'deck'
+require_relative 'game_rules'
 
 class Game
+  include GameRules
+
   def initialize
     @interface = Interface.new
     @player = Player.new(@interface.enter_name)
@@ -18,7 +21,7 @@ class Game
 
   def get_start_cards(*players)
     players.each do |player|
-      2.times { player.take_card(@deck) }
+      2.times { player.take_card(@deck.deal_card) }
     end
   end
 
@@ -35,7 +38,7 @@ class Game
       begin
         @game_bank.make_bets(@player, @dealer)
       rescue RuntimeError => e
-        puts e.message
+        @interface.show_error(e.message)
         break
       end
 
@@ -53,7 +56,7 @@ class Game
       choice = @interface.offer_play
       break if choice == 'N'
 
-      # # remove cards from hand before the next game
+      # remove cards from hand before the next game
       @player.clear_hand
       @dealer.clear_hand
     end
@@ -72,14 +75,14 @@ class Game
         @interface.amount_message(@player.amount, @dealer.amount)
         break
       when 3
-        @player.take_card(@deck)
+        @player.take_card(@deck.deal_card)
         dealer_move
       else
         @interface.no_answer
       end
 
       # automatic opening of cards if there are 3
-      if @player.cards_size == 3 && @dealer.cards_size == 3
+      if !@player.can_take_card? && !@dealer.can_take_card?
         game_result
         @interface.amount_message(@player.amount, @dealer.amount)
         break
@@ -91,34 +94,37 @@ class Game
   end
 
   def show_cards_player_dealer
-    @interface.show_cards_points_player(@player.player_cards, @player.count_points)
-    @interface.show_hide_cards_dealer(@dealer.player_cards_hide)
+    @interface.show_cards(@player.name, @player.player_cards)
+    @interface.show_sum(@player.name, @player.count_sum)
+    @interface.show_hidden_cards(@dealer.name, @dealer.player_cards.size)
   end
 
   def dealer_move
-    @dealer.count_points
-    @dealer.take_card(@deck) if @dealer.take_card?
+    @dealer.count_sum
+    @dealer.take_card(@deck.deal_card) if @dealer.can_take_card?
   end
 
   def open_cards
-    @interface.show_cards_points_player(@player.player_cards, @player.count_points)
-    @interface.show_cards_points_dealer(@dealer.player_cards, @dealer.count_points)
+    @interface.show_cards(@player.name, @player.player_cards)
+    @interface.show_sum(@player.name, @player.count_sum)
+    @interface.show_cards(@dealer.name, @dealer.player_cards)
+    @interface.show_sum(@dealer.name, @dealer.count_sum)
   end
 
   def find_winner
-    player_points = @player.count_points
-    dealer_points = @dealer.count_points
-    if player_points > 21 && dealer_points > 21
+    player_sum = @player.count_sum
+    dealer_sum = @dealer.count_sum
+    if player_sum > GameRules::BJ && dealer_sum > GameRules::BJ
       return :none
-    elsif player_points <= 21 && dealer_points <= 21 && player_points == dealer_points
+    elsif player_sum <= GameRules::BJ && dealer_sum <= GameRules::BJ && player_sum == dealer_sum
       return :draw
-    elsif player_points == 21 && dealer_points < 21 || dealer_points > 21
+    elsif player_sum == GameRules::BJ && dealer_sum < GameRules::BJ || dealer_sum > GameRules::BJ
       return :player
-    elsif player_points < 21 && dealer_points < player_points || dealer_points > 21
+    elsif player_sum < GameRules::BJ && dealer_sum < player_sum || dealer_sum > GameRules::BJ
       return :player
-    elsif dealer_points == 21 && player_points < 21 || player_points > 21
+    elsif dealer_sum == GameRules::BJ && player_sum < GameRules::BJ || player_sum > GameRules::BJ
       return :dealer
-    elsif dealer_points < 21 && player_points < dealer_points || player_points > 21
+    elsif dealer_sum < GameRules::BJ && player_sum < dealer_sum || player_sum > GameRules::BJ
       return :dealer
     end
   end

@@ -21,7 +21,7 @@ class Game
 
   def get_start_cards(*players)
     players.each do |player|
-      2.times { player.take_card(@deck.deal_card) }
+      2.times { player.add_card(@deck.deal_card) }
     end
   end
 
@@ -75,7 +75,7 @@ class Game
         @interface.amount_message(@player.amount, @dealer.amount)
         break
       when 3
-        @player.take_card(@deck.deal_card)
+        @player.add_card(@deck.deal_card)
         dealer_move
       else
         @interface.no_answer
@@ -94,20 +94,20 @@ class Game
   end
 
   def show_cards_player_dealer
-    @interface.show_cards(@player.name, @player.player_cards)
+    @interface.show_cards(@player.name, @player.cards)
     @interface.show_sum(@player.name, @player.count_sum)
-    @interface.show_hidden_cards(@dealer.name, @dealer.player_cards.size)
+    @interface.show_hidden_cards(@dealer.name, @dealer.cards.size)
   end
 
   def dealer_move
     @dealer.count_sum
-    @dealer.take_card(@deck.deal_card) if @dealer.can_take_card?
+    @dealer.add_card(@deck.deal_card) if @dealer.can_take_card?
   end
 
   def open_cards
-    @interface.show_cards(@player.name, @player.player_cards)
+    @interface.show_cards(@player.name, @player.cards)
     @interface.show_sum(@player.name, @player.count_sum)
-    @interface.show_cards(@dealer.name, @dealer.player_cards)
+    @interface.show_cards(@dealer.name, @dealer.cards)
     @interface.show_sum(@dealer.name, @dealer.count_sum)
   end
 

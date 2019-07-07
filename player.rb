@@ -10,7 +10,7 @@ class Player
   extend Forwardable
 
   attr_reader :name, :hand, :bank
-  def_delegators :@hand, :cards, :add_card, :two_cards?, :full?, :count_sum, :clear_hand
+  def_delegators :@hand, :cards, :add_card, :count_sum, :clear_hand
   def_delegators :@bank, :amount, :debit, :withdraw
 
   def initialize(name)

@@ -15,10 +15,6 @@ class Hand
     @cards << card
   end
 
-  def two_cards?
-    @cards.size == 2
-  end
-
   def full?
     @cards.size == GameRules::HAND_MAX_SIZE
   end

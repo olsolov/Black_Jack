@@ -9,6 +9,12 @@ require_relative 'deck'
 require_relative 'game_rules'
 
 class Game
+  PLAYER_ACTIONS = {
+    skip: 1,
+    open_cards: 2,
+    add_card: 3
+  }.freeze
+
   include GameRules
 
   def initialize
@@ -19,77 +25,32 @@ class Game
     run
   end
 
+  def run
+    loop do
+      reset_state
+      get_start_cards(@player, @dealer)
+      show_cards_player_dealer
+      make_bets
+      play_round
+      round_results
+      check_dealer_balance!
+      break unless continue_game?
+    end
+  rescue RuntimeError => e
+    @interface.show_error(e.message)
+  end
+
+  private
+
+  def reset_state
+    @deck = Deck.new
+    @player.clear_hand
+    @dealer.clear_hand
+  end
+
   def get_start_cards(*players)
     players.each do |player|
       2.times { player.add_card(@deck.deal_card) }
-    end
-  end
-
-  def run
-    @deck = Deck.new
-    loop do
-      # hand out 2 cards
-      get_start_cards(@player, @dealer)
-
-      # show player's and dealer's hide cards
-      show_cards_player_dealer
-
-      # make bets
-      begin
-        @game_bank.make_bets(@player, @dealer)
-      rescue RuntimeError => e
-        @interface.show_error(e.message)
-        break
-      end
-
-      @interface.bet_message
-      @interface.amount_message(@player.amount, @dealer.amount)
-
-      main_part_game
-
-      if @dealer.amount.zero?
-        @interface.dealer_bankrupt_message
-        break
-      end
-
-      # offer to play more
-      choice = @interface.offer_play
-      break if choice == 'N'
-
-      # remove cards from hand before the next game
-      @player.clear_hand
-      @dealer.clear_hand
-    end
-  end
-
-  def main_part_game
-    loop do
-      # prompt the player to choose an action
-      choice = @interface.action_menu(@player.two_cards?)
-
-      case choice
-      when 1
-        dealer_move
-      when 2
-        game_result
-        @interface.amount_message(@player.amount, @dealer.amount)
-        break
-      when 3
-        @player.add_card(@deck.deal_card)
-        dealer_move
-      else
-        @interface.no_answer
-      end
-
-      # automatic opening of cards if there are 3
-      if !@player.can_take_card? && !@dealer.can_take_card?
-        game_result
-        @interface.amount_message(@player.amount, @dealer.amount)
-        break
-      end
-
-      # show player's and dealer's hide cards
-      show_cards_player_dealer
     end
   end
 
@@ -99,9 +60,42 @@ class Game
     @interface.show_hidden_cards(@dealer.name, @dealer.cards.size)
   end
 
-  def dealer_move
+  def make_bets
+    @game_bank.make_bets(@player, @dealer)
+    @interface.bet_message
+    @interface.amount_message(@player.amount, @dealer.amount)
+  end
+
+  def play_round
+    loop do
+      choice = @interface.action_menu(@player.can_take_card?)
+      break if choice == PLAYER_ACTIONS[:open_cards]
+
+      player_turn(choice)
+      dealer_turn
+      break unless players_have_moves?
+
+      show_cards_player_dealer
+    end
+  end
+
+  def player_turn(choice)
+    if choice == PLAYER_ACTIONS[:skip]
+      dealer_turn
+    elsif choice == PLAYER_ACTIONS[:add_card]
+      @player.add_card(@deck.deal_card)
+    else
+      @interface.no_answer
+    end
+  end
+
+  def dealer_turn
     @dealer.count_sum
     @dealer.add_card(@deck.deal_card) if @dealer.can_take_card?
+  end
+
+  def players_have_moves?
+    @player.can_take_card? || @dealer.can_take_card?
   end
 
   def open_cards
@@ -140,10 +134,21 @@ class Game
     end
   end
 
-  def game_result
+  def round_results
     open_cards
     @interface.show_winner(find_winner)
     give_cash(find_winner)
+    @interface.amount_message(@player.amount, @dealer.amount)
+  end
+
+  def check_dealer_balance!
+    @interface.dealer_bankrupt_message if @dealer.amount.zero?
+    exit if @dealer.amount.zero?
+  end
+
+  def continue_game?
+    choice = @interface.offer_play
+    choice == 'Y'
   end
 end
 

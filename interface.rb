@@ -30,10 +30,10 @@ class Interface
     puts "На вашем счету: #{player_amount}$. На счету дилера: #{dealer_amount}$."
   end
 
-  def action_menu(two_cards_in_hand)
+  def action_menu(can_take_card)
     puts 'Введите 1, если вы хотите пропустить ход'
     puts 'Введите 2, если вы хотите открыть карты'
-    puts 'Введите 3, если вы хотите взять картy' if two_cards_in_hand
+    puts 'Введите 3, если вы хотите взять картy' if can_take_card
     gets.to_i
   end
 

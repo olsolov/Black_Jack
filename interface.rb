@@ -43,13 +43,11 @@ class Interface
 
   def show_winner(winner)
     case winner
-    when :none
-      puts 'Победителя нет'
-    when :draw
+    when 1
       puts 'Ничья!'
-    when :player
+    when 2
       puts 'Вы выиграли!'
-    when :dealer
+    when 3
       puts 'Дилер выиграл!'
     end
   end

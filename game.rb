@@ -129,13 +129,13 @@ class Game
     end
   end
 
-  def give_cash(winner)
-    case winner
-    when 1
+  def give_cash(round_result)
+    case round_result
+    when ROUND_RESULTS[:draw]
       @game_bank.refund(@player, @dealer)
-    when 2
+    when ROUND_RESULTS[:player_won]
       @game_bank.reward_winner(@player)
-    when 3
+    when ROUND_RESULTS[:dealer_won]
       @game_bank.reward_winner(@dealer)
     end
   end

@@ -15,6 +15,12 @@ class Game
     add_card: 3
   }.freeze
 
+  ROUND_RESULTS = {
+    draw: 1,
+    player_won: 2,
+    dealer_won: 3
+  }.freeze
+
   include GameRules
 
   def initialize
@@ -109,27 +115,27 @@ class Game
     player_sum = @player.count_sum
     dealer_sum = @dealer.count_sum
     if player_sum > GameRules::BJ && dealer_sum > GameRules::BJ
-      return :none
-    elsif player_sum <= GameRules::BJ && dealer_sum <= GameRules::BJ && player_sum == dealer_sum
-      return :draw
-    elsif player_sum == GameRules::BJ && dealer_sum < GameRules::BJ || dealer_sum > GameRules::BJ
-      return :player
-    elsif player_sum < GameRules::BJ && dealer_sum < player_sum || dealer_sum > GameRules::BJ
-      return :player
-    elsif dealer_sum == GameRules::BJ && player_sum < GameRules::BJ || player_sum > GameRules::BJ
-      return :dealer
-    elsif dealer_sum < GameRules::BJ && player_sum < dealer_sum || player_sum > GameRules::BJ
-      return :dealer
+      ROUND_RESULTS[:draw]
+    elsif player_sum == dealer_sum
+      ROUND_RESULTS[:draw]
+    elsif player_sum > GameRules::BJ
+      ROUND_RESULTS[:dealer_won]
+    elsif dealer_sum > GameRules::BJ
+      ROUND_RESULTS[:player_won]
+    elsif dealer_sum > player_sum
+      ROUND_RESULTS[:dealer_won]
+    elsif player_sum > dealer_sum
+      ROUND_RESULTS[:player_won]
     end
   end
 
   def give_cash(winner)
     case winner
-    when :draw
+    when 1
       @game_bank.refund(@player, @dealer)
-    when :player
+    when 2
       @game_bank.reward_winner(@player)
-    when :dealer
+    when 3
       @game_bank.reward_winner(@dealer)
     end
   end
